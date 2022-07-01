@@ -1,0 +1,89 @@
+.playlist {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.playlist-initial {
+    padding: 5px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: var(--bg);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.playlist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    height: 75px;
+    gap: 5px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+.playlist-item.playing {
+    background-color: var(--border);
+}
+.playlist-item:not(.add-video) .btn {
+    padding: 5px;
+}
+.playlist-item.playing .borderBtn {
+    border-color: var(--bg);
+}
+.playlist-item.playing .borderBtn:hover {
+    background-color: var(--bg);
+}
+.playlist-item .thumb {
+    border-radius: 5px;
+    height: 100%;
+    z-index: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(45deg, rgba(150, 150, 150, 0.5) 0%, rgba(50, 50, 50, 0.5) 100%);
+}
+.playlist-item .thumb svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.playlist-item-body {
+    overflow: hidden;
+    flex-grow: 1;
+}
+.playlist-item h2 {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 0;
+}
+.closeBtn {
+    background-color: transparent;
+    border: 0;
+}
+
+.add-video {
+    position: sticky;
+    bottom: 0;
+    border: 1px solid var(--primary);
+    background-color: var(--bg);
+}
+.add-video .video-initial {
+    position: static;
+    background-color: transparent;
+}
+.add-video .input input[type="text"] {
+    flex-shrink: 1;
+    width: 100%;
+}
+
+@media screen and (max-width: 1000px) {
+    .playlist-item .video-initial > .btn > span {
+        display: none;
+    }
+}

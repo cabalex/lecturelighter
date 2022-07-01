@@ -1,0 +1,15 @@
+.sidebar {
+    border: 1px solid var(--border);
+    min-width: 290px;
+    width: 30vw;
+    flex-grow: 1;
+    border-radius: 5px;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    color: var(--subdued)
+}
