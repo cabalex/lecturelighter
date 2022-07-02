@@ -28,6 +28,7 @@
     background-color: #ff6d00;
     height: 100%;
     pointer-events: none;
+    user-select: none;
 }
 .tl-event {
     position: absolute;
@@ -43,6 +44,7 @@
     line-height: 100%;
     font-size: 1rem;
     pointer-events: none;
+    user-select: none;
 
     z-index: 3;
 

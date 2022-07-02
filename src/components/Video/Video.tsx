@@ -14,17 +14,8 @@ function Video({videoHandler, setVideoElem} : {videoHandler: VideoHandler, setVi
     }, [videoRef, setVideoElem])
 
     videoHandler.subscribe('destroyed', forceUpdate);
+    videoHandler.subscribe('playlistremove', forceUpdate);
     videoHandler.subscribe('loadeddata', forceUpdate);
-
-    const toggleVideo = () => {
-        if (videoHandler.isLoaded()) {
-            if (videoHandler.video.paused) {
-                videoHandler.play();
-            } else {
-                videoHandler.video.pause();
-            }
-        }
-    }
 
 
     // NOTE TO SELF: DO NOT PUT VIDEO CONTROLS IN {} HERE! IT WILL BREAK RERENDERS FOR SOME REASON >:(
@@ -34,11 +25,11 @@ function Video({videoHandler, setVideoElem} : {videoHandler: VideoHandler, setVi
                 className="video-outer"
                 style={
                     (videoHandler.isLoaded() && {
-                        height: `calc(70vw * ${videoHandler.video.videoHeight / videoHandler.video.videoWidth})`,
+                        height: `calc(${window.innerWidth < 1000 ? '100vw' : '70vw'} * ${videoHandler.video.videoHeight / videoHandler.video.videoWidth})`,
                     }) || undefined
                 }>
-                {!videoHandler.isLoaded() && <VideoInitial videoHandler={videoHandler} />}
-                <video ref={videoRef} autoPlay width="100%" height="100%" onClick={toggleVideo}>
+                {videoHandler.playlist.length === 0 && <VideoInitial videoHandler={videoHandler} />}
+                <video ref={videoRef} autoPlay width="100%" height="100%" onClick={() => videoHandler.togglePlay()}>
                     <track kind="captions" />
                 </video>
                 <VideoControls videoHandler={videoHandler} />

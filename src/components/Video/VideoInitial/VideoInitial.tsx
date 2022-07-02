@@ -25,12 +25,17 @@ function VideoInitial({videoHandler} : {videoHandler: VideoHandler}) {
         if (videoHandler.playlist.length === 0) setUrlLoading(true);
         
         if (textRef.current) {
-            videoHandler.addVideo(textRef.current.value);
+            let url = textRef.current.value;
+            videoHandler.addVideo(url, `${(url.split('//')[1] || url).split('/')[0]} Video`);
             textRef.current.value = '';   
         }
     }
 
     videoHandler.subscribe('loadeddata', () => {
+        setFileLoading(false);
+        setUrlLoading(false);
+    })
+    videoHandler.subscribe('loaderror', () => {
         setFileLoading(false);
         setUrlLoading(false);
     })

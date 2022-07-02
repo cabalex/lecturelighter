@@ -3,3 +3,31 @@
     margin: 10px;
     padding-bottom: 10px;
 }
+.sidebar .mobile-toggle {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 5;
+    background-color: var(--bg);
+}
+.sidebar.hidden .mobile-toggle {
+    right: calc(100% + 45px);
+    animation: fadeOut 2s ease-in-out;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+
+@media screen and (min-width: 1001px) {
+    .mobile-toggle {
+        display: none;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.1;
+    }
+}

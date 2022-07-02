@@ -24,8 +24,9 @@ function VideoControls({videoHandler} : {videoHandler: VideoHandler}) {
         if (seeking || override) {
             let bounding = e.target.getBoundingClientRect();
             let width = bounding.width;
-            let x = width + bounding.x - e.clientX;
+            let x = width + bounding.x - (e.clientX || e.touches[0].x);
             videoHandler.video.currentTime = (width - x) / width * videoHandler.video.duration;
+            e.stopPropagation();
             forceUpdate();
         }
     }
@@ -73,6 +74,7 @@ function VideoControls({videoHandler} : {videoHandler: VideoHandler}) {
                 className="video-timeline"
                 onMouseDown={(e) => {setSeeking(true); handleMouseCursor(e, true)}}
                 onMouseMove={handleMouseCursor}
+                onTouchMove={handleMouseCursor}
                 onMouseOut={() => setSeeking(false)}
                 onMouseUp={() => setSeeking(false)}
             >
@@ -85,7 +87,7 @@ function VideoControls({videoHandler} : {videoHandler: VideoHandler}) {
                             <span className="to-stamp">{secondsToTime(videoHandler.video.duration / videoHandler.video.playbackRate)})</span>
                         </React.Fragment>
                     )}
-                    {videoHandler.video.playbackRate === videoHandler.skipSpeed && <FastForward />}
+                    {(videoHandler.video.playbackRate === videoHandler.skipSpeed && videoHandler.video.playbackRate !== videoHandler.normalSpeed) && <FastForward />}
                 </div>
                 {
                     videoHandler.skipRegions.map(({from, to} : {from:number, to:number}, index ) =>

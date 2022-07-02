@@ -13,3 +13,18 @@
 footer {
     color: var(--subdued)
 }
+
+@media screen and (max-width: 1000px) {
+    .sidebar {
+        position: absolute;
+        right: 10px;
+        top: 0;
+        width: calc(100% - 30px);
+        height: calc(100% - 30px);
+        z-index: 5;
+        background-color: var(--bg);
+    }
+    .sidebar.hidden {
+        right: -100%;
+    }
+}

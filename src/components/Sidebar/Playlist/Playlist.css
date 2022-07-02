@@ -87,3 +87,18 @@
         display: none;
     }
 }
+
+@media screen and (max-height: 500px) {
+    .sidebar {
+        display: block;
+    }
+    .playlist {
+        overflow: visible;
+    }
+    .playlist-initial {
+        border-radius: 5px;
+    }
+    .add-video {
+        height: 40px;
+    }
+}

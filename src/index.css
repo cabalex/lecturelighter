@@ -56,6 +56,9 @@ a {
   color: unset;
   text-decoration: none;
 }
+.strikethrough {
+  text-decoration: line-through;
+}
 
 .btn {
   background-color: var(--primary);
