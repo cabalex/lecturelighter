@@ -12,22 +12,17 @@
 }
 .sidebar.hidden .mobile-toggle {
     right: calc(100% + 45px);
-    animation: fadeOut 2s ease-in-out;
-    animation-delay: 1s;
-    animation-fill-mode: forwards;
+    opacity: 0.1;
+    transition-delay: 1s;
+    transition: opacity 0.5s linear;
 }
+.sidebar.hidden .mobile-toggle:hover {
+    opacity: 1 !important;
+}
+
 
 @media screen and (min-width: 1001px) {
     .mobile-toggle {
         display: none;
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0.1;
     }
 }

@@ -229,7 +229,7 @@ class VideoHandler {
             skipDuration += region.to - region.from;
             lastRegion = region.to;
         }
-        normalDuration += this.video.duration - lastRegion;
+        normalDuration += (index === this.playlistIndex ? this.video.duration : this.playlist[index].duration) - lastRegion;
 
 
         return (this.normalSpeed === -1 ? 0 : normalDuration / this.normalSpeed) + (this.skipSpeed === -1 ? 0 : skipDuration / this.skipSpeed);
