@@ -169,6 +169,15 @@ class VideoHandler {
         this.message('playlistremove');
     }
 
+    movePlaylistItem(from: number, to: number) {
+        let item = this.playlist.splice(from, 1)[0];
+        this.playlist.splice(to, 0, item);
+
+        if (this.playlistIndex === from) this.playlistIndex = to;
+
+        this.message('playlistchange');
+    }
+
     isLoaded() {
         return this.video.src && this.video.src !== window.location.href && this.video.readyState > 0;
     }
@@ -254,19 +263,21 @@ class VideoHandler {
 
     togglePlay() {
         if (this.video.paused) {
-            this.video.play();
+            this.play();
         } else {
-            this.video.pause();
+            this.pause();
         }
     }
 
     play() {
         this.video.play();
         this.render();
+        this.message('videoplay');
     }
 
     pause() {
         this.video.pause();
+        this.message('videopause');
     }
 
     render() {

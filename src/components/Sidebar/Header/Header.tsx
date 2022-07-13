@@ -38,6 +38,12 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
         [0.5, 'Deaf'],
         [0.75, 'Hyperdeaf'],
     ])
+
+    const destroy = () => {
+        if (videoHandler.playlist.length === 1 || window.confirm('Are you sure you want to delete ALL videos?\nHint: If you just want to delete this video, click the X next to it in the playlist.')) {
+            videoHandler.destroy();
+        }
+    }
     
 
     videoHandler.subscribe('loadeddata', forceUpdate);
@@ -46,18 +52,16 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
 
     return (
         <header>
-            <h1>LectureLighter</h1>
+            <h1 className="btn borderBtn" style={{fontSize: '2em', marginBlockStart: 0}} onClick={showHelpModal}>
+                LectureLighter
+            </h1>
             <div className="btn borderBtn mobile-toggle" onClick={() => setIsMobileHidden(!isMobileHidden)}>
                 {isMobileHidden ? <OpenInFull /> : <Close />}
             </div>
-
-            {videoHandler.isLoaded() ?
-                <p>Trimmed time: <b>{secondsToTime(videoHandler.calculateTrimmedDuration())}</b></p> :
-                <p>Make lectures easier to watch</p>}
             
             <div className="btnrow">
-                {videoHandler.isLoaded() &&
-                    (<div className="btn" onClick={() => videoHandler.destroy()}>
+                {videoHandler.isLoaded() && videoHandler.playlist.length > 0 &&
+                    (<div className="btn" onClick={destroy}>
                         <Close  />
                     </div>)
                 }
@@ -83,9 +87,6 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
                 >
                     <Equalizer />
                     <span>{thresholdLabels.get(videoHandler.audioThreshold)}</span>
-                </div>
-                <div className="btn borderBtn" onClick={showHelpModal}>
-                    <QuestionMark  />
                 </div>
             </div>
         </header>

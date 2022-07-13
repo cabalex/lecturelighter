@@ -15,6 +15,8 @@ function Playlist({videoHandler} : {videoHandler: VideoHandler}) {
     videoHandler.subscribe('playlistremove', forceUpdate);
     videoHandler.subscribe('playlistchange', forceUpdate);
     videoHandler.subscribe('speedchange', forceUpdate);
+    videoHandler.subscribe('videoplay', forceUpdate);
+    videoHandler.subscribe('videopause', forceUpdate);
 
     let count = videoHandler.playlist.length;
     let durations = videoHandler.playlist.map(a => a.duration);
@@ -28,7 +30,7 @@ function Playlist({videoHandler} : {videoHandler: VideoHandler}) {
             {count > 0 && <div className="playlist-initial">
                 {count} {count === 1 ? 'video' : 'videos'} - {realDuration > 0 && <span className="strikethrough">{secondsToTime(realDuration)}</span>} <b>{secondsToTime(reducedDuration)}</b> long {realDuration > 0 && `(${Math.round(-100 + reducedDuration / realDuration * 100)}%)`} - {ETAend}</div>}
             {videoHandler.playlist.map((video, i) => (
-                <PlaylistItem videoHandler={videoHandler} key={i} index={i} video={video} />
+                <PlaylistItem videoHandler={videoHandler} key={video.src + i} index={i} video={video} />
             ))}
             <div className="playlist-item add-video">
                 <VideoInitial videoHandler={videoHandler} />

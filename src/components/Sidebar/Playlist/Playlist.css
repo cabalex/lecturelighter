@@ -61,6 +61,22 @@
     white-space: nowrap;
     overflow: hidden;
     margin: 0;
+    width: 100%;
+    min-height: 30px;
+}
+.playlist-item .title-input {
+    width: calc(100% - 8px);
+    border: 1px solid var(--border);
+    color: white;
+    outline: none;
+    border-radius: 5px;
+    font-size: 1.5em;
+    margin-bottom: 5px;
+    font-weight: bold;
+    background-color: transparent;
+}
+.playlist-item.playing .title-input {
+    border-color: var(--bg);
 }
 .closeBtn {
     background-color: transparent;
