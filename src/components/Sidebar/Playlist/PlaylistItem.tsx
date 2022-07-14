@@ -1,7 +1,7 @@
 import React from 'react';
 import './Playlist.css';
 import VideoHandler, { VideoPlaylistInstance } from '../../../handlers/VideoHandler';
-import { ArrowDownward, ArrowUpward, Autorenew, Close, Edit, Error, Link } from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward, Autorenew, Close, Error, Link } from '@mui/icons-material';
 import { secondsToTime } from '../../Video/VideoControls/VideoControls';
 
 function PlaylistItem({videoHandler, video, index} : {videoHandler: VideoHandler, video: VideoPlaylistInstance, index: number}) {

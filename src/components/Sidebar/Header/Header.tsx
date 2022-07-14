@@ -1,8 +1,7 @@
 import React from 'react';
 import './Header.css';
 import VideoHandler from '../../../handlers/VideoHandler';
-import { Close, Equalizer, FastForward, OpenInFull, PlayArrow, QuestionMark } from '@mui/icons-material';
-import { secondsToTime } from '../../Video/VideoControls/VideoControls';
+import { Close, Equalizer, FastForward, OpenInFull, PlayArrow } from '@mui/icons-material';
 
 function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden} : {videoHandler: VideoHandler, showHelpModal: any, isMobileHidden: boolean, setIsMobileHidden: any}) {
     const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
