@@ -2,41 +2,31 @@ import React from 'react';
 import './Header.css';
 import VideoHandler from '../../../handlers/VideoHandler';
 import { Close, Equalizer, FastForward, OpenInFull, PlayArrow } from '@mui/icons-material';
+import DropdownBtn from '../../DropdownBtn/DropdownBtn';
+
+const speeds = [
+    {name: "0.25x", value: 0.25},
+    {name: "0.5x", value: 0.5},
+    {name: "0.75x", value: 0.75},
+    {name: "Normal", value: 1},
+    {name: "1.25x", value: 1.25},
+    {name: "1.5x", value: 1.5},
+    {name: "2x", value: 2},
+    {name: "3x", value: 3},
+    {name: "5x", value: 5},
+    {name: "Skip over", value: -1}
+]
+
+const thresholds = [
+    {name: 'Hypersensitive', value: 0.1},
+    {name: 'Sensitive', value: 0.2},
+    {name: 'Balanced', value: 0.3},
+    {name: 'Deaf', value: 0.5},
+    {name: 'Hyperdeaf', value: 0.75},
+]
 
 function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden} : {videoHandler: VideoHandler, showHelpModal: any, isMobileHidden: boolean, setIsMobileHidden: any}) {
     const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
-
-    const changeNormalSpeed = () => {
-        let speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 5, -1];
-        let index = speeds.indexOf(videoHandler.normalSpeed) || 0;
-        let nextIndex = (index + 1) % speeds.length;
-        videoHandler.setNormalSpeed(speeds[nextIndex]);
-        forceUpdate();
-    }
-
-    const changeSkipSpeed = () => {
-        let speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 5, -1];
-        let index = speeds.indexOf(videoHandler.skipSpeed) || 0;
-        let nextIndex = (index + 1) % speeds.length;
-        videoHandler.setSkipSpeed(speeds[nextIndex]);
-        forceUpdate();
-    }
-
-    const changeAudioThreshold = () => {
-        let loudness = [0.1, 0.2, 0.3, 0.5, 0.75];
-        let index = loudness.indexOf(videoHandler.audioThreshold) || 0;
-        let nextIndex = (index + 1) % loudness.length;
-        videoHandler.setAudioThreshold(loudness[nextIndex]);
-        forceUpdate();
-    }
-
-    const thresholdLabels = new Map([
-        [0.1, 'Hypersensitive'],
-        [0.2, 'Sensitive'],
-        [0.3, 'Balanced'],
-        [0.5, 'Deaf'],
-        [0.75, 'Hyperdeaf'],
-    ])
 
     const destroy = () => {
         if (videoHandler.playlist.length === 1 || window.confirm('Are you sure you want to delete ALL videos?\nHint: If you just want to delete this video, click the X next to it in the playlist.')) {
@@ -46,6 +36,7 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
     
 
     videoHandler.subscribe('loadeddata', forceUpdate);
+    videoHandler.subscribe('playlistremove', forceUpdate);
     videoHandler.subscribe('destroyed', forceUpdate);
     videoHandler.subscribe('loadedskipregions', forceUpdate);
 
@@ -64,29 +55,36 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
                         <Close  />
                     </div>)
                 }
-                <div
+                <DropdownBtn
                     className="btn borderBtn"
-                    onClick={() => changeNormalSpeed()}
+                    options={speeds}
+                    title="Change normal speed (the speed of audible parts)."
+                    value={videoHandler.normalSpeed}
+                    onSelect={(speed) => { videoHandler.setNormalSpeed(speed); forceUpdate()}}
                 >
                     <PlayArrow  />
                     <span>{videoHandler.normalSpeed === -1 ? 'Skip over' : `${videoHandler.normalSpeed}x Speed`}</span>
-                </div>
-                <div
+                </DropdownBtn>
+                <DropdownBtn
                     className="btn borderBtn"
-                    onClick={() => changeSkipSpeed()}
+                    options={speeds}
                     title="Change skip speed (the speed of silent parts)."
+                    value={videoHandler.skipSpeed}
+                    onSelect={(speed) => { videoHandler.setSkipSpeed(speed); forceUpdate()}}
                 >
                     <FastForward  />
                     <span>{videoHandler.skipSpeed === -1 ? 'Skip over' : `${videoHandler.skipSpeed}x Speed`}</span>
-                </div>
-                <div
+                </DropdownBtn>
+                <DropdownBtn
                     className="btn borderBtn"
-                    onClick={() => changeAudioThreshold()}
-                    title="Change sensitivity for audio detection."
+                    options={thresholds}
+                    title="Change skip speed (the speed of silent parts)."
+                    value={videoHandler.audioThreshold}
+                    onSelect={(threshold) => { videoHandler.setAudioThreshold(threshold); forceUpdate()}}
                 >
                     <Equalizer />
-                    <span>{thresholdLabels.get(videoHandler.audioThreshold)}</span>
-                </div>
+                    <span>{thresholds.filter(x => x.value === videoHandler.audioThreshold)[0].name}</span>
+                </DropdownBtn>
             </div>
         </header>
     );

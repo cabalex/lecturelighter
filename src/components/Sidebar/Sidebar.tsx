@@ -11,7 +11,7 @@ function Sidebar({videoHandler, showHelpModal} : {videoHandler: VideoHandler, sh
         <div className={isMobileHidden ? "sidebar hidden" : "sidebar"}>
             <Header videoHandler={videoHandler} showHelpModal={showHelpModal} isMobileHidden={isMobileHidden} setIsMobileHidden={setIsMobileHidden} />
             <Playlist videoHandler={videoHandler} />
-            <footer><a href="https://github.com/cabalex/lecturelighter">lecturelighter v3</a> - <a href="https://cabalex.github.io">Made with pain by @cabalex</a></footer>
+            <footer><a href="https://github.com/cabalex/lecturelighter">lecturelighter v4</a> - <a href="https://cabalex.github.io">Made with pain by @cabalex</a></footer>
         </div>
     );
 }

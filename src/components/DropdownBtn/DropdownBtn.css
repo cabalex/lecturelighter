@@ -1,0 +1,32 @@
+.dropdown {
+    position: relative;
+}
+.dropdown:not(.open) .dropdownOptions {
+    display: none;
+}
+.dropdownOptions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: calc(100% - 10px);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px;
+    z-index: 5;
+    display: none;
+
+    display: flex;
+    flex-direction: column;
+}
+.dropdownOptions > div {
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.dropdownOptions > .selected {
+    background-color: var(--border);
+}
+.dropdownOptions > div:hover {
+    background-color: var(--primary);
+}

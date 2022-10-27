@@ -1,4 +1,4 @@
-import { Close, PlayArrow, FastForward, Equalizer } from "@mui/icons-material";
+import { Close, PlayArrow, FastForward, Equalizer, OpenInFull } from "@mui/icons-material";
 import * as React from "react";
 import "./HelpModal.css";
 
@@ -39,6 +39,8 @@ function HelpModal({shown, hideHelpModal} : {shown: boolean, hideHelpModal: any}
             <h2>FAQ</h2>
             <b>Why isn't this working on iOS?</b>
             <p>iOS is very finnicky about how video players work, and I haven't been able to find a stable solution yet. I'm working on it, though!</p>
+            <b>How do I reopen the sidebar on mobile?</b>
+            <p>You can reopen the sidebar by tapping the <OpenInFull /> button on the top right. It becomes very faint so you can watch the video, but it's still there!</p>
             <b>An exclamation point appeared next to my video and it won't play.</b>
             <p>This means that the app either failed to load your video or could not decode its audio. This usually means it is incompatible, and you'll need to try another file or convert it using an external tool.</p>
             <h2>About</h2>

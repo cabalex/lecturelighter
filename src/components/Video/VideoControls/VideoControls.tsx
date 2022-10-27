@@ -11,9 +11,10 @@ export function secondsToTime(seconds: number) {
 }
 
 
-function VideoControls({videoHandler} : {videoHandler: VideoHandler}) {
+function VideoControls({outerRef, videoHandler} : {outerRef: React.RefObject<HTMLDivElement>, videoHandler: VideoHandler}) {
     const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void
     const [seeking, setSeeking] = React.useState(false);
+    const [visible, setVisible] = React.useState(true);
 
     videoHandler.subscribe('timeupdate', forceUpdate);
     videoHandler.subscribe('loadedskipregions', forceUpdate);
@@ -50,11 +51,34 @@ function VideoControls({videoHandler} : {videoHandler: VideoHandler}) {
     }
 
     function fullscreen() {
-        videoHandler.video.requestFullscreen();
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            outerRef.current?.requestFullscreen();
+        }
     }
     
+    function handleMouseIn() {
+        setVisible(true);
+    }
+    function handleMouseOut() {
+        setVisible(false);
+    }
+    
+    React.useEffect(() => {
+        let ref = outerRef.current;
+        
+        ref?.addEventListener('mouseenter', handleMouseIn);
+        ref?.addEventListener('mouseleave', handleMouseOut);
+
+        return () => {
+            ref?.removeEventListener('mouseenter', handleMouseIn);
+            ref?.removeEventListener('mouseleave', handleMouseOut);
+        }
+    }, [outerRef]);
+    
     return (
-        <div className={videoHandler.isLoaded() ? "video-controls" : "video-controls hidden"}>
+        <div className={videoHandler.isLoaded() && visible ? "video-controls" : "video-controls hidden"}>
             <div
                 className={videoHandler.playlistIndex === 0 ? "btn playBtn disabledBtn" : "btn playBtn"}
                 onClick={skipPrev}
