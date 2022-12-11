@@ -41,6 +41,7 @@ function VideoInitial({videoHandler} : {videoHandler: VideoHandler}) {
         e.stopPropagation();
         e.preventDefault();
         setDragOver(false);
+        setFileLoading(true);
         for (let i = 0; i < e.dataTransfer.files.length; i++) {
             let file = e.dataTransfer.files[i];
             videoHandler.addVideo(URL.createObjectURL(file), file.name);

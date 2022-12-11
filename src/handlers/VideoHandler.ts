@@ -21,6 +21,7 @@ class VideoHandler {
     loadQueue = new LoadQueue(this);
 
     isLoadingSkipRegions = false;
+    skipRegionOffset = 0;
 
     normalSpeed: number = 1;
     skipSpeed: number = 2;
@@ -136,9 +137,11 @@ class VideoHandler {
     }
 
     nextVideo() {
+        this.skipRegionOffset = 0;
         if (this.playlistIndex + 1 < this.playlist.length) this.load(this.playlistIndex + 1);
     }
     previousVideo() {
+        this.skipRegionOffset = 0;
         if (this.playlistIndex > 0) this.load(this.playlistIndex - 1);
     }
 
@@ -156,6 +159,7 @@ class VideoHandler {
         if (this.playlist.length === 0) {
             this.video.src = '';
         } else if (this.playlistIndex === index) {
+            this.skipRegionOffset = 0;
             this.load(Math.min(this.playlistIndex, this.playlist.length - 1));
         } else if (this.playlistIndex > index) {
             this.playlistIndex--;
@@ -230,8 +234,8 @@ class VideoHandler {
             
             normalDuration += region[0] - lastRegion;
             
-            skipDuration += region[0] - region[0];
-            lastRegion = region[0];
+            skipDuration += region[1] - region[0];
+            lastRegion = region[1];
         }
         normalDuration += (index === this.playlistIndex ? this.video.duration : this.playlist[index].duration) - lastRegion;
 
@@ -275,29 +279,49 @@ class VideoHandler {
         this.message('videopause');
     }
 
+    seek(time: number) {
+        if (this.video.fastSeek) {
+            this.video.fastSeek(time);
+        } else {
+            this.video.currentTime = time;
+        }
+    }
+
     render() {
         /*if (!this.video.paused) {
             cancelAnimationFrame(this.handle);
             this.handle = requestAnimationFrame(this.render.bind(this));
         }*/
         this.message('timeupdate');
-        
-        let inside = this.skipRegions.filter(region => (this.video.currentTime >= region[0] && this.video.currentTime < region[0]))
-        
-        if (inside.length > 0) {
+
+        let inside: null|[number, number] = null;
+
+        if (this.skipRegions[this.skipRegionOffset]) {
+            // reset offset if skipped backward
+            if (this.skipRegions[this.skipRegionOffset][0] > this.video.currentTime) {
+                this.skipRegionOffset = 0;
+            }
+            
+            while (this.skipRegions[this.skipRegionOffset][1] < this.video.currentTime) {
+                if (!this.skipRegions[this.skipRegionOffset + 1]) break;
+
+                this.skipRegionOffset++;
+            }
+            if (this.skipRegions[this.skipRegionOffset] && this.skipRegions[this.skipRegionOffset][0] < this.video.currentTime) {
+                inside = this.skipRegions[this.skipRegionOffset];
+            }
+        }
+
+        if (inside) {
             if (this.skipSpeed === -1) {
-                this.video.currentTime = inside[0][0] + 0.01;
+                this.seek(inside[1] + 0.01);
             } else if (this.video.playbackRate !== this.skipSpeed) {
                 this.video.playbackRate = this.skipSpeed;
             }
         } else {
             if (this.normalSpeed === -1) {
-                let next = this.skipRegions.filter(region => this.video.currentTime < region[0]);
-                if (next.length > 0) {
-                    this.video.currentTime = next[0][0];
-                } else {
-                    this.video.currentTime = this.video.duration;
-                }
+                let next = this.skipRegions[this.skipRegionOffset + 1];
+                this.seek(next ? next[0] : this.video.duration);
             } else if (this.video.playbackRate !== this.normalSpeed) {
                 this.video.playbackRate = this.normalSpeed;
             }

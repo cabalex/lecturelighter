@@ -128,7 +128,6 @@ export default class LoadQueue {
             function onMessage(e:any) {
                 const [messageSrc, rms, regions] = e.data;
                 if (src === messageSrc) {
-                    console.log(regions)
                     resolve([regions, rms]);
                     ctx.audioProcessor.removeEventListener('message', onMessage);
                 }

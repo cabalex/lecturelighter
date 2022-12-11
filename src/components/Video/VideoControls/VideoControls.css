@@ -12,7 +12,7 @@
     bottom: 0;
     left: 0;
     z-index: 2;
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAADUlEQVQImWNgYGA4AwAA0QDNCV2I3QAAAABJRU5ErkJggg==');
+    background-color: #222;
     animation: popIn 0.2s ease-in-out;
 }
 .video-timeline {
@@ -65,7 +65,7 @@
 
 .video-controls.hidden {
     animation: popOut 0.2s ease-in-out;
-    bottom: -8%;
+    bottom: -40px;
 }
 
 .video-controls .popup {
@@ -73,7 +73,7 @@
     pointer-events: none;
     right: 0px;
     bottom: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: #222;
     padding: 5px;
     margin: 5px;
     border-radius: 5px;
@@ -85,7 +85,7 @@
 }
 .video-controls .popup.closed {
     animation: popOut 0.2s ease-in-out;
-    bottom: -8%;
+    bottom: -40px;
     opacity: 0;
 }
 
