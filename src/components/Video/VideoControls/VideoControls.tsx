@@ -114,7 +114,7 @@ function VideoControls({outerRef, videoHandler} : {outerRef: React.RefObject<HTM
                     {(videoHandler.video.playbackRate === videoHandler.skipSpeed && videoHandler.video.playbackRate !== videoHandler.normalSpeed) && <FastForward />}
                 </div>
                 {
-                    videoHandler.skipRegions.map(({from, to} : {from:number, to:number}, index ) =>
+                    videoHandler.skipRegions.map(([from, to] : [from:number, to:number], index ) =>
                         <div
                             className="tl-event"
                             key={index}

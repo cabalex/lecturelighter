@@ -1,4 +1,4 @@
-import VideoHandler, { VideoPlaylistInstance, SkipRegion } from "./VideoHandler";
+import VideoHandler, { VideoPlaylistInstance } from "./VideoHandler";
 
 export default class LoadQueue {
     queue: VideoPlaylistInstance[] = []
@@ -35,7 +35,7 @@ export default class LoadQueue {
             this.queue.unshift(instance);
         }
 
-        return new Promise<SkipRegion[]>(resolve => {
+        return new Promise<Array<[number, number]>>(resolve => {
             let interval = setInterval(() => {
                 if (instance.skipRegions !== null) {
                     clearInterval(interval);
@@ -100,7 +100,7 @@ export default class LoadQueue {
         })
     }
 
-    private reprocessAudio(src: string, rmsBuffer: Float32Array, sampleRate: number, threshold=this.parent.audioThreshold) : Promise<SkipRegion[]> {
+    private reprocessAudio(src: string, rmsBuffer: Float32Array, sampleRate: number, threshold=this.parent.audioThreshold) : Promise<Array<[number, number]>> {
         let ctx = this;
 
         return new Promise((resolve, reject) => {
@@ -121,13 +121,14 @@ export default class LoadQueue {
         })
     }
 
-    private processAudio(src: string, audioBuffer: AudioBuffer, threshold=this.parent.audioThreshold) : Promise<[SkipRegion[], Float32Array]> {
+    private processAudio(src: string, audioBuffer: AudioBuffer, threshold=this.parent.audioThreshold) : Promise<[Array<[number, number]>, Float32Array]> {
         let ctx = this;
 
         return new Promise((resolve, reject) => {
             function onMessage(e:any) {
                 const [messageSrc, rms, regions] = e.data;
                 if (src === messageSrc) {
+                    console.log(regions)
                     resolve([regions, rms]);
                     ctx.audioProcessor.removeEventListener('message', onMessage);
                 }

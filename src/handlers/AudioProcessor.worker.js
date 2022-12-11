@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-globals
 self.onmessage = async ({data: [src, leftChannel, sampleRate, threshold, isRMSBuffer]}) => {
+    // Array<[from: float seconds, to: float seconds]>
     let skipRegions = [];
 
     let step = Math.round(sampleRate / 10);
@@ -32,10 +33,7 @@ self.onmessage = async ({data: [src, leftChannel, sampleRate, threshold, isRMSBu
         let isLoud = samplesRMS[i] / loudestSample > threshold;
 
         if (isLoud && fromSample) {
-            skipRegions.push({
-                from: toSeconds(fromSample * step),
-                to: toSeconds(i * step)
-            });
+            skipRegions.push(Float32Array.from([toSeconds(fromSample * step), toSeconds(i * step)]));
             fromSample = null;
         } else if (!isLoud && !fromSample) {
             fromSample = i;
@@ -43,18 +41,15 @@ self.onmessage = async ({data: [src, leftChannel, sampleRate, threshold, isRMSBu
     }
 
     if (fromSample) {
-        skipRegions.push({
-            from: toSeconds(fromSample * step),
-            to: toSeconds(leftChannel.length)
-        });
+        skipRegions.push(Float32Array.from([toSeconds(fromSample * step), toSeconds(leftChannel.length)]));
     }
 
     // filter out regions that are obnoxiously short
-    skipRegions = skipRegions.filter(({from, to}) => to - from > 0.1);
+    skipRegions = skipRegions.filter(region => region[1] - region[0] > 0.5);
 
     if (isRMSBuffer) {
-        postMessage([src, skipRegions.filter(region => region.to - region.from > 0.5)]);
+        postMessage([src, skipRegions]);
     } else {
-        postMessage([src, samplesRMS, skipRegions.filter(region => region.to - region.from > 0.5)]);
+        postMessage([src, samplesRMS, skipRegions]);
     }
 }

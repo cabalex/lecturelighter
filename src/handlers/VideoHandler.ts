@@ -1,16 +1,11 @@
 import LoadQueue from "./LoadQueue";
 
-export interface SkipRegion {
-    from: number,
-    to: number
-}
-
 export interface VideoPlaylistInstance {
     src: string,
     duration: number,
     sampleRate: number,
     title: string,
-    skipRegions: SkipRegion[] | null,
+    skipRegions: Array<[number, number]> | null,
     rms: Float32Array | null,
 }
 
@@ -19,7 +14,7 @@ class VideoHandler {
 
     subscribers = new Map();
 
-    skipRegions: SkipRegion[] = [];
+    skipRegions: Array<[number, number]> = [];
     playlistIndex = 0;
     playlist: VideoPlaylistInstance[] = [];
 
@@ -192,14 +187,14 @@ class VideoHandler {
         for (let i = 0; i < skipRegions.length; i++) {
             let region = skipRegions[i];
 
-            if (region.from > this.video.currentTime) break;
+            if (region[0] > this.video.currentTime) break;
             
-            normalDuration += region.from - lastRegion;
+            normalDuration += region[0] - lastRegion;
 
-            if (region.to > this.video.currentTime) break;
+            if (region[0] > this.video.currentTime) break;
             
-            skipDuration += region.to - region.from;
-            lastRegion = region.to;
+            skipDuration += region[0] - region[0];
+            lastRegion = region[0];
         }
         normalDuration += this.video.currentTime - lastRegion;
 
@@ -233,10 +228,10 @@ class VideoHandler {
         for (let i = 0; i < skipRegions.length; i++) {
             let region = skipRegions[i];
             
-            normalDuration += region.from - lastRegion;
+            normalDuration += region[0] - lastRegion;
             
-            skipDuration += region.to - region.from;
-            lastRegion = region.to;
+            skipDuration += region[0] - region[0];
+            lastRegion = region[0];
         }
         normalDuration += (index === this.playlistIndex ? this.video.duration : this.playlist[index].duration) - lastRegion;
 
@@ -287,19 +282,19 @@ class VideoHandler {
         }*/
         this.message('timeupdate');
         
-        let inside = this.skipRegions.filter(region => (this.video.currentTime >= region.from && this.video.currentTime < region.to))
+        let inside = this.skipRegions.filter(region => (this.video.currentTime >= region[0] && this.video.currentTime < region[0]))
         
         if (inside.length > 0) {
             if (this.skipSpeed === -1) {
-                this.video.currentTime = inside[0].to + 0.01;
+                this.video.currentTime = inside[0][0] + 0.01;
             } else if (this.video.playbackRate !== this.skipSpeed) {
                 this.video.playbackRate = this.skipSpeed;
             }
         } else {
             if (this.normalSpeed === -1) {
-                let next = this.skipRegions.filter(region => this.video.currentTime < region.from);
+                let next = this.skipRegions.filter(region => this.video.currentTime < region[0]);
                 if (next.length > 0) {
-                    this.video.currentTime = next[0].from;
+                    this.video.currentTime = next[0][0];
                 } else {
                     this.video.currentTime = this.video.duration;
                 }
