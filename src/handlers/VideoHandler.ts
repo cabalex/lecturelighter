@@ -188,22 +188,30 @@ class VideoHandler {
 
         let skipRegions = this.skipRegions || [];
 
+        let paddedTime = 0;
         for (let i = 0; i < skipRegions.length; i++) {
             let region = skipRegions[i];
 
-            if (region[0] > this.video.currentTime) break;
+            if (region[0] > this.video.currentTime) {
+                normalDuration += this.video.currentTime - lastRegion;
+                break;
+            }
             
             normalDuration += region[0] - lastRegion;
 
-            if (region[0] > this.video.currentTime) break;
+            if (region[1] > this.video.currentTime) {
+                skipDuration += this.video.currentTime - region[0];
+                break;
+            }
             
-            skipDuration += region[0] - region[0];
-            lastRegion = region[0];
+            skipDuration += region[1] - region[0];
+            paddedTime += 0.1;
+            lastRegion = region[1];
         }
-        normalDuration += this.video.currentTime - lastRegion;
 
 
-        return normalDuration / this.normalSpeed + (this.skipSpeed === -1 ? 0 : skipDuration / this.skipSpeed);
+        // since skip regions take some time to move to, we add a little bit of time to the duration
+        return normalDuration / this.normalSpeed + (this.skipRegions.length * 0.2 - paddedTime) + (this.skipSpeed === -1 ? 0 : skipDuration / this.skipSpeed);
     }
 
     calculatePlaylistDuration() {

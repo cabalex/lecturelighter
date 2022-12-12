@@ -78,7 +78,7 @@ function Header({videoHandler, showHelpModal, isMobileHidden, setIsMobileHidden}
                 <DropdownBtn
                     className="btn borderBtn"
                     options={thresholds}
-                    title="Change skip speed (the speed of silent parts)."
+                    title="Change audio sensitivity (how much is detected as noise)."
                     value={videoHandler.audioThreshold}
                     onSelect={(threshold) => { videoHandler.setAudioThreshold(threshold); forceUpdate()}}
                 >
