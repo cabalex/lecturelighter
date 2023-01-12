@@ -4,6 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// dummy service worker (PWA support)
+navigator.serviceWorker.register('./dummy-service-worker.js', { scope: './' })
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
