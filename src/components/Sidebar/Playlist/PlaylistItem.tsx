@@ -1,7 +1,7 @@
 import React from 'react';
 import './Playlist.css';
 import VideoHandler, { VideoPlaylistInstance } from '../../../handlers/VideoHandler';
-import { ArrowDownward, ArrowUpward, Autorenew, Close, Error, Link } from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward, Autorenew, Close, Download, Error, Link } from '@mui/icons-material';
 import { secondsToTime } from '../../Video/VideoControls/VideoControls';
 
 function PlaylistItem({videoHandler, video, index} : {videoHandler: VideoHandler, video: VideoPlaylistInstance, index: number}) {
@@ -25,6 +25,21 @@ function PlaylistItem({videoHandler, video, index} : {videoHandler: VideoHandler
         videoHandler.loadQueue.add(videoHandler.playlist[index]);
         videoHandler.loadQueue.priority(videoHandler.playlist[index]);
         setIsError(null);
+    }
+
+    const download = (e:any) => {
+        e.stopPropagation();
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = videoHandler.playlist[index].src;
+        // the filename you want
+        let ext = videoHandler.playlist[index].src.split(".");
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.download = `${videoHandler.playlist[index].title}.${ext[ext.length - 1]}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     const titleOuterClick = (e:any) => {
@@ -90,12 +105,20 @@ function PlaylistItem({videoHandler, video, index} : {videoHandler: VideoHandler
                     <Close />
                 </div>
                 {
-                    isError === true && (<div
-                        className="btn"
-                        title="Retry loading"
-                        onClick={retry}>
-                            <Autorenew />
-                    </div>)
+                    isError === true && (<>
+                        <div
+                            className="btn"
+                            title="Retry loading"
+                            onClick={retry}>
+                                <Autorenew />
+                        </div>
+                        <div
+                            className="btn"
+                            title="Try downloading"
+                            onClick={download}>
+                                <Download />
+                        </div>
+                    </>)
                 }
                 <div
                     className="btn borderBtn"
