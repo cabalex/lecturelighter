@@ -40,6 +40,33 @@ class VideoHandler {
         });
         this.video.addEventListener('loadedmetadata', () => this.message('loadedmetadata'));
         this.video.addEventListener('loadeddata', () => this.message('loadeddata'));
+
+        let storedSettings = window.localStorage.getItem('LL-settings');
+        if (storedSettings) {
+            let settings = JSON.parse(storedSettings);
+            this.normalSpeed = settings.normalSpeed;
+            this.skipSpeed = settings.skipSpeed;
+            this.audioThreshold = settings.audioThreshold;
+        }
+
+        // only run this if we have the video element
+        if (video) {
+            if (window.location.href.includes("?url=")) {
+                let args = window.location.href.split("?url=")[1];
+                let [url, title] = args.split("&title=").map(arg => decodeURIComponent(arg));
+    
+                window.history.replaceState({}, document.title, window.location.href.split("?url=")[0]);
+    
+                this.addVideo(url, title);
+            }
+    
+            // @ts-ignore If lecturelighter tab, use open window
+            chrome.runtime.onMessage.addListener((message) => {
+                if (message.type === 'OPEN_VIDEO') {
+                    this.addVideo(message.url, message.title)
+                }
+            })
+        }
     }
 
     addVideo(url: string, title?: string) {
@@ -77,16 +104,27 @@ class VideoHandler {
         this.message('loadedplaylistskipregions', this.playlist.indexOf(instance));
     }
 
+    private saveSettings() {
+        window.localStorage.setItem('LL-settings', JSON.stringify({
+            normalSpeed: this.normalSpeed,
+            skipSpeed: this.skipSpeed,
+            audioThreshold: this.audioThreshold
+        }));
+    }
+
     setNormalSpeed(speed: number) {
         this.normalSpeed = speed;
+        this.saveSettings();
         this.message('speedchange');
     }
     setSkipSpeed(speed: number) {
         this.skipSpeed = speed;
+        this.saveSettings();
         this.message('speedchange');
     }
     setAudioThreshold(threshold: number) {
         this.audioThreshold = threshold;
+        this.saveSettings();
         this.message('audiochange');
 
         if (this.playlist.length > 0) {

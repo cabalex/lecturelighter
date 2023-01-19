@@ -49,6 +49,7 @@ export default class LoadQueue {
         this.running = true;
         while (this.queue.length) {
             const instance = this.queue.shift();
+            console.log("Loading", instance?.src)
             if (instance) {
                 if (instance.rms == null) {
                     let audioBuffer = await this.getAudioBuffer(instance.src).catch(() => {});
@@ -87,7 +88,7 @@ export default class LoadQueue {
     private async getAudioBuffer(url: string) : Promise<AudioBuffer> {
         let audioContext = new AudioContext();
         return await new Promise((resolve, reject) => {
-            var req = new XMLHttpRequest();
+            let req = new XMLHttpRequest();
             req.open( "GET", url, true );
             req.responseType = "arraybuffer";    
             req.onreadystatechange = function (e) {
