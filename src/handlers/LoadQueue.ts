@@ -49,7 +49,6 @@ export default class LoadQueue {
         this.running = true;
         while (this.queue.length) {
             const instance = this.queue.shift();
-            console.log("Loading", instance?.src)
             if (instance) {
                 if (instance.rms == null) {
                     let audioBuffer = await this.getAudioBuffer(instance.src).catch(() => {});

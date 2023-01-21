@@ -19,7 +19,10 @@
   "service_worker": "./background.js"
  },
  "permissions": [
-  "activeTab", "tabs"
+  "tabs", "declarativeNetRequest"
+ ],
+ "host_permissions": [
+    "*://*.zoom.us/*"
  ],
  "action": {},
   "content_security_policy": {

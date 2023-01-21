@@ -6,6 +6,7 @@ export interface VideoPlaylistInstance {
     sampleRate: number,
     title: string,
     skipRegions: Array<[number, number]> | null,
+    referrer: string,
     rms: Float32Array | null,
 }
 
@@ -52,30 +53,42 @@ class VideoHandler {
         // only run this if we have the video element
         if (video) {
             if (window.location.href.includes("?url=")) {
-                let args = window.location.href.split("?url=")[1];
-                let [url, title] = args.split("&title=").map(arg => decodeURIComponent(arg));
+                let args = new URLSearchParams(window.location.search);
+                
+                let url = args.get('url') || '';
+                let title = args.get('title') || '';
+
+                // Cookies need to be set for certain videos (e.g. Zoom)
+                let cookie = args.get('cookie') || '';
+                if (cookie) document.cookie = cookie;
+
+                let referrer = args.get('referrer') || undefined;
     
                 window.history.replaceState({}, document.title, window.location.href.split("?url=")[0]);
     
-                this.addVideo(url, title);
+                this.addVideo(url, title, referrer);
             }
     
             // @ts-ignore If lecturelighter tab, use open window
-            chrome.runtime.onMessage.addListener((message) => {
-                if (message.type === 'OPEN_VIDEO') {
-                    this.addVideo(message.url, message.title)
+            if (chrome) chrome.runtime.onMessage.addListener(
+                (message: any) => {
+                    if (message.type === 'OPEN_VIDEO') {
+                        if (message.cookie) document.cookie = message.cookie;
+                        this.addVideo(message.url, message.title || "", message.referrer)
+                    }
                 }
-            })
+            )
         }
     }
 
-    addVideo(url: string, title?: string) {
+    addVideo(url: string, title?: string, customReferrer?: string) {
         let item = {
             src: url,
             title: title || url,
             duration: 0,
             sampleRate: 0,
             rms: null,
+            referrer: customReferrer || null,
             skipRegions: null
         } as VideoPlaylistInstance;
         
@@ -160,6 +173,9 @@ class VideoHandler {
         this.playlistIndex = newIndex;
         this.skipRegions = [];
         this.isLoadingSkipRegions = true;
+
+        // @ts-ignore - set referrer for extension
+        window.videoReferrer = video.referrer;
 
         this.message('playlistchange');
 
