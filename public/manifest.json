@@ -1,7 +1,7 @@
 {
   "name": "LectureLighter",
   "description": "Make lectures on the web faster to watch",
-  "version": "1.0",
+  "version": "1.2",
   "manifest_version": 3,
   "icons": {
       "16": "logo192.png",
