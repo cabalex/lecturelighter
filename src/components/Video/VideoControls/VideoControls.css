@@ -13,7 +13,8 @@
     left: 0;
     z-index: 2;
     background-color: #222;
-    animation: popIn 0.2s ease-in-out;
+    animation: popOut 0.2s ease-in-out;
+    bottom: -40px;
 }
 .video-timeline {
     flex-grow: 1;
@@ -63,9 +64,9 @@
     padding: 5px;
 }
 
-.video-controls.hidden {
-    animation: popOut 0.2s ease-in-out;
-    bottom: -40px;
+.video-controls.shown {
+    animation: popIn 0.2s ease-in-out;
+    bottom: 0px;
 }
 
 .video-controls .popup {

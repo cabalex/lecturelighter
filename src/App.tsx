@@ -7,12 +7,13 @@ import VideoHandler from './handlers/VideoHandler';
 
 function App() {
     const [videoElem, setVideoElem] = React.useState<HTMLVideoElement | null>(null);
+    const [audioElem, setAudioElem] = React.useState<HTMLAudioElement | null>(null);
     const [videoHandler, setVideoHandler] = React.useState<VideoHandler>(new VideoHandler());
     const [helpModalOpen, setHelpModalOpen] = React.useState(false);
 
     React.useEffect(() => {
-        if (videoElem) setVideoHandler(new VideoHandler(videoElem));
-    }, [videoElem])
+        if (videoElem && audioElem) setVideoHandler(new VideoHandler(videoElem, audioElem));
+    }, [videoElem, audioElem])
 
     const keyDown = React.useCallback((e:any) => {
         switch(e.keyCode) {
@@ -48,7 +49,7 @@ function App() {
 
     return (
         <div className="App">
-            <Video videoHandler={videoHandler} setVideoElem={setVideoElem} />
+            <Video videoHandler={videoHandler} setVideoElem={setVideoElem} setAudioElem={setAudioElem} />
             <Sidebar videoHandler={videoHandler} showHelpModal={() => setHelpModalOpen(true)} />
             <HelpModal shown={helpModalOpen} hideHelpModal={() => setHelpModalOpen(false)} />
         </div>

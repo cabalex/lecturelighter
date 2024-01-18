@@ -27,6 +27,7 @@ function VideoControls({outerRef, videoHandler} : {outerRef: React.RefObject<HTM
             let width = bounding.width;
             let x = width + bounding.x - (e.clientX || e.touches[0].x);
             videoHandler.video.currentTime = (width - x) / width * videoHandler.video.duration;
+            videoHandler.audio.currentTime = (width - x) / width * videoHandler.audio.duration;
             e.stopPropagation();
             forceUpdate();
         }
@@ -78,7 +79,7 @@ function VideoControls({outerRef, videoHandler} : {outerRef: React.RefObject<HTM
     }, [outerRef]);
     
     return (
-        <div className={videoHandler.isLoaded() && visible ? "video-controls" : "video-controls hidden"}>
+        <div className={videoHandler.isLoaded() && visible ? "video-controls shown" : "video-controls"}>
             <div
                 className={videoHandler.playlistIndex === 0 ? "btn playBtn disabledBtn" : "btn playBtn"}
                 onClick={skipPrev}

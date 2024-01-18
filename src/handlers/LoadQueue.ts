@@ -51,12 +51,12 @@ export default class LoadQueue {
             const instance = this.queue.shift();
             if (instance) {
                 if (instance.rms == null) {
-                    let audioBuffer = await this.getAudioBuffer(instance.src).catch(() => {});
+                    let audioBuffer = await this.getAudioBuffer(instance.audio || instance.src).catch(() => {});
                     if (audioBuffer) {
                         instance.duration = audioBuffer.duration;
                         instance.sampleRate = audioBuffer.sampleRate;
 
-                        [instance.skipRegions, instance.rms] = await this.processAudio(instance.src, audioBuffer, this.parent.audioThreshold).catch(() => [null, null]);
+                        [instance.skipRegions, instance.rms] = await this.processAudio(instance.audio || instance.src, audioBuffer, this.parent.audioThreshold).catch(() => [null, null]);
                         
                         if (this.parent.getCachedLoad() > 500000) {
                             // Don't cache any further if above 500k elements (~2 MB in Float32Array)
@@ -72,7 +72,7 @@ export default class LoadQueue {
                         this.parent.videoError(instance);
                     }
                 } else {
-                    instance.skipRegions = await this.reprocessAudio(instance.src, instance.rms, instance.sampleRate, this.parent.audioThreshold).catch(() => null);
+                    instance.skipRegions = await this.reprocessAudio(instance.audio || instance.src, instance.rms, instance.sampleRate, this.parent.audioThreshold).catch(() => null);
                     if (instance.skipRegions !== null) {
                         this.parent.videoLoadedSkipRegions(instance);
                     } else {

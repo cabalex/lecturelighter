@@ -4,8 +4,9 @@ import VideoInitial from './VideoInitial/VideoInitial';
 import VideoHandler from '../../handlers/VideoHandler';
 import VideoControls from './VideoControls/VideoControls';
 
-function Video({videoHandler, setVideoElem} : {videoHandler: VideoHandler, setVideoElem:any}) {
+function Video({videoHandler, setVideoElem, setAudioElem} : {videoHandler: VideoHandler, setVideoElem:any, setAudioElem:any}) {
     let videoRef = React.useRef<HTMLVideoElement>(null);
+    let audioRef = React.useRef<HTMLAudioElement>(null);
     let outerRef = React.useRef<HTMLDivElement>(null);
     const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void
 
@@ -13,6 +14,10 @@ function Video({videoHandler, setVideoElem} : {videoHandler: VideoHandler, setVi
     React.useEffect(() => {
         setVideoElem(videoRef.current);
     }, [videoRef, setVideoElem])
+
+    React.useEffect(() => {
+        setAudioElem(audioRef.current);
+    }, [audioRef, setAudioElem])
 
     videoHandler.subscribe('destroyed', forceUpdate);
     videoHandler.subscribe('playlistremove', forceUpdate);
@@ -34,6 +39,7 @@ function Video({videoHandler, setVideoElem} : {videoHandler: VideoHandler, setVi
                 <video ref={videoRef} autoPlay width="100%" height="100%" onClick={() => videoHandler.togglePlay()}>
                     <track kind="captions" />
                 </video>
+                <audio ref={audioRef} autoPlay style={{position: 'absolute', opacity: 0, pointerEvents: 'none'}} />
                 <VideoControls outerRef={outerRef} videoHandler={videoHandler} />
             </div>
         </main>

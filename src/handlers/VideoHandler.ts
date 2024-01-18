@@ -7,11 +7,13 @@ export interface VideoPlaylistInstance {
     title: string,
     skipRegions: Array<[number, number]> | null,
     referrer: string,
+    audio?: string,
     rms: Float32Array | null,
 }
 
 class VideoHandler {
     video: HTMLVideoElement;
+    audio: HTMLAudioElement;
 
     subscribers = new Map();
 
@@ -30,8 +32,9 @@ class VideoHandler {
 
     handle: number = 0; // handle for requestAnimationFrame to prevent multiple calls
 
-    constructor(video?: HTMLVideoElement) {
+    constructor(video?: HTMLVideoElement, audio?: HTMLAudioElement) {
         this.video = video || document.createElement('video');
+        this.audio = audio || document.createElement('audio');
         this.video.addEventListener('timeupdate', this.render.bind(this));
         this.video.addEventListener('ended', () => {
             this.message('ended')
@@ -63,10 +66,12 @@ class VideoHandler {
                 if (cookie) document.cookie = cookie;
 
                 let referrer = args.get('referrer') || undefined;
+
+                let audio = args.get('audio') || undefined;
     
                 window.history.replaceState({}, document.title, window.location.href.split("?url=")[0]);
     
-                this.addVideo(url, title, referrer);
+                this.addVideo(url, title, audio, referrer);
             }
     
             // @ts-ignore If lecturelighter tab, use open window
@@ -74,14 +79,14 @@ class VideoHandler {
                 (message: any) => {
                     if (message.type === 'OPEN_VIDEO') {
                         if (message.cookie) document.cookie = message.cookie;
-                        this.addVideo(message.url, message.title || "", message.referrer)
+                        this.addVideo(message.url, message.title || "", message.audio, message.referrer)
                     }
                 }
             )
         }
     }
 
-    addVideo(url: string, title?: string, customReferrer?: string) {
+    addVideo(url: string, title?: string, audio?: string, customReferrer?: string) {
         let item = {
             src: url,
             title: title || url,
@@ -89,6 +94,7 @@ class VideoHandler {
             sampleRate: 0,
             rms: null,
             referrer: customReferrer || null,
+            audio: audio || null,
             skipRegions: null
         } as VideoPlaylistInstance;
         
@@ -170,6 +176,7 @@ class VideoHandler {
     async load(newIndex: number) {
         let video = this.playlist[newIndex];
         this.video.src = video.src;
+        this.audio.src = video.audio || "";
         this.playlistIndex = newIndex;
         this.skipRegions = [];
         this.isLoadingSkipRegions = true;
@@ -201,6 +208,7 @@ class VideoHandler {
 
     destroy() {
         this.video.src = '';
+        this.audio.src = '';
         // remove from playlist
         this.playlist = [];
         this.loadQueue.destroy();
@@ -212,6 +220,7 @@ class VideoHandler {
         this.playlist.splice(index, 1);
         if (this.playlist.length === 0) {
             this.video.src = '';
+            this.audio.src = '';
         } else if (this.playlistIndex === index) {
             this.skipRegionOffset = 0;
             this.load(Math.min(this.playlistIndex, this.playlist.length - 1));
@@ -332,20 +341,24 @@ class VideoHandler {
 
     play() {
         this.video.play();
+        this.audio.play();
         this.render();
         this.message('videoplay');
     }
 
     pause() {
         this.video.pause();
+        this.audio.pause();
         this.message('videopause');
     }
 
     seek(time: number) {
         if (this.video.fastSeek) {
             this.video.fastSeek(time);
+            this.audio.fastSeek(time);
         } else {
             this.video.currentTime = time;
+            this.audio.currentTime = time;
         }
     }
 
@@ -379,6 +392,7 @@ class VideoHandler {
                 this.seek(inside[1] + 0.01);
             } else if (this.video.playbackRate !== this.skipSpeed) {
                 this.video.playbackRate = this.skipSpeed;
+                this.audio.playbackRate = this.skipSpeed;
             }
         } else {
             if (this.normalSpeed === -1) {
@@ -386,6 +400,7 @@ class VideoHandler {
                 this.seek(next ? next[0] : this.video.duration);
             } else if (this.video.playbackRate !== this.normalSpeed) {
                 this.video.playbackRate = this.normalSpeed;
+                this.audio.playbackRate = this.normalSpeed;
             }
         }
     }

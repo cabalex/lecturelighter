@@ -23,33 +23,71 @@ function canvasPlayerHook() {
 
 function yujaPlayerHook() {
     let menu = document.getElementsByClassName('player-mainbar')[0];
-    let title = document.querySelector("[property='og:title'][content]")?.content;
     let video = document.getElementById('hls-stream0');
     if (!menu || !video) return;
 
     clearInterval(interval);
 
-    document.body.style.overflow = "hidden";
-
-    let element = document.createElement('div');
-    element.className = 'player-icon-class focusable';
-    element.title = "Open in LectureLighter"
-    element.style = "height: unset"
-    element.innerHTML = '<img alt="LL" src="https://cabalex.github.io/lecturelighter/logo192.png" style="width: 32px; cursor: pointer;">'
-    element.onclick = () => {
-        fetch("/P/Data/VideoJSON", {
-            headers: {
-                cookie: document.cookie,
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-            },
-            body: "video=1139899&a=94972627&getPlayerType=true&node=10854882&list=-1&singlePass=&useTrackingUserPID=false&domain=media.ucsc.edu&sourceIdCode=vmciolvd&cim=false&noCache=false",
-            method: "POST"
-        }).then(res => res.json()).then(json => {
-            chrome.runtime.sendMessage({type: 'OPEN_VIDEO', url: json.video.videoLinkMp4, title})
-        })
+    function pauseAllMedia() {
+        // pause all videos
+        let videos = document.getElementsByTagName('video');
+        for (let i = 0; i < videos.length; i++) {
+            videos[i].pause();
+        }
+        let audio = document.getElementsByTagName('audio');
+        for (let i = 0; i < audio.length; i++) {
+            audio[i].pause();
+        }
     }
-    let menuElems = document.getElementById('commentWrapper');
-    menu.insertBefore(element, menuElems);
+
+    let v = document.location.href.split("v=")[1].split("&")[0];
+    let node = document.location.href.split("node=")[1].split("&")[0];
+    let a = document.location.href.split("a=")[1].split("&")[0];
+    fetch("/P/Data/VideoJSON", {
+        headers: {
+            cookie: document.cookie,
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: `video=${v}&a=${a}&getPlayerType=true&node=${node}&list=-1&singlePass=&useTrackingUserPID=false&domain=${document.location.host}&sourceIdCode=vmciolvd&cim=false&noCache=false`,
+        method: "POST"
+    }).then(res => res.json()).then(json => {
+        if (json.video.videoLinkMp4) {
+            let element = document.createElement('div');
+            element.className = 'player-icon-class focusable';
+            element.title = "Open in LectureLighter"
+            element.style = "height: unset"
+            element.innerHTML = '<img alt="LL" src="https://cabalex.github.io/lecturelighter/logo192.png" style="width: 32px; cursor: pointer;">'
+            element.onclick = () => {
+                pauseAllMedia();
+                element.style = "height: unset; cursor: wait;";
+                chrome.runtime.sendMessage({type: 'OPEN_VIDEO', url: json.video.videoLinkMp4, title: json.video.videoTitle});
+            }
+            let menuElems = document.getElementById('commentWrapper');
+            menu.insertBefore(element, menuElems);
+            return;
+        }
+        // MULTIPLE STREAMS - have to do more digging...
+        fetch(`/P/Data/VideoSource?video=${encodeURIComponent(json.video.videoLink)}&videoPID=${v}&videoListNodePID=${node}&mp4Only=true&includeThumbnails=false&contentToken=${json.contentToken}`, { headers: { cookie: document.cookie }}).then(res => res.json()).then(newJson => {
+            let streams = newJson.streams.filter(s => s.typeAndVideoSourceMap.MP4);
+            let audio = newJson.streams.filter(s => s.typeAndVideoSourceMap.AUDIO);
+            console.log(streams);
+
+            for (let i = 0; i < streams.length; i++) {
+                let element = document.createElement('div');
+                element.className = 'player-icon-class focusable';
+                element.title = `Open display ${i + 1} in LectureLighter`
+                element.style = "height: unset; position: relative;"
+                element.innerHTML = `<img alt="LL" src="https://cabalex.github.io/lecturelighter/logo192.png" style="width: 32px; cursor: pointer;"><span style="position: absolute; right: 5px; bottom: 0; color: white">${i + 1}</span>`
+                element.onclick = () => {
+                    pauseAllMedia();
+                    element.style = "height: unset; cursor: wait;";
+                    chrome.runtime.sendMessage({type: 'OPEN_VIDEO', url: streams[i].typeAndVideoSourceMap.MP4.fileURL, audio: audio[0]?.typeAndVideoSourceMap.AUDIO.fileURL, title: json.video.videoTitle});
+                }
+                let menuElems = document.getElementById('commentWrapper');
+                menu.insertBefore(element, menuElems);
+            }
+        })
+    })
 }
 
 function zoomPlayerHook() {

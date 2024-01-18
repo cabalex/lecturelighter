@@ -8,6 +8,9 @@ chrome.runtime.onMessage.addListener(async (request) => {
   switch(request.type) {
       case 'OPEN_VIDEO':
         let url = chrome.runtime.getURL("index.html") + "?url=" + encodeURIComponent(request.url) + "&title=" + encodeURIComponent(request.title);
+        if (request.audio) {
+          url += "&audio=" + encodeURIComponent(request.audio);
+        }
         if (request.cookie) {
           url += "&cookie=" + encodeURIComponent(request.cookie);
         }
